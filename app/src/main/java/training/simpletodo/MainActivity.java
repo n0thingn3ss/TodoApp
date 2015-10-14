@@ -1,5 +1,6 @@
 package training.simpletodo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -10,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.apache.commons.io.FileUtils;
 
@@ -21,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> items;
     ArrayAdapter<String> itemsAdapter;
     ListView lvItems;
+    private final int REQUEST_CODE = 200;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +74,36 @@ public class MainActivity extends AppCompatActivity {
         writeItems();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // REQUEST_CODE is defined above
+        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
+            // Extract name value from result extras
+            String item = data.getExtras().getString("item");
+            int item_pos = data.getExtras().getInt("item_pos", -1);
+            // Toast the name to display temporarily on screen
+            items.set(item_pos, item);
+            itemsAdapter.notifyDataSetChanged();
+            writeItems();
+            Toast.makeText(this, item.concat(Integer.toString(item_pos)), Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void setupListViewListener() {
+        lvItems.setOnItemClickListener(
+                new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapter,
+                                            View item,
+                                            int pos,
+                                            long id) {
+                        Intent editItem = new Intent(MainActivity.this, EditItemActivity.class);
+                        editItem.putExtra("item", items.get(pos));
+                        editItem.putExtra("item_pos", pos);
+                        startActivityForResult(editItem, REQUEST_CODE);
+                    }
+                }
+        );
         lvItems.setOnItemLongClickListener(
                 new AdapterView.OnItemLongClickListener() {
                     @Override
