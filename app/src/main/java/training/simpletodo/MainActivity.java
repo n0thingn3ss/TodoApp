@@ -21,7 +21,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     ArrayList<TodoItem> mItems;
-    CustomArrayAdapter mItemsAdapter;
+    TodoItemAdapter mItemsAdapter;
     ListView lvItems;
     private final int REQUEST_CODE = 200;
 
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         mItems.add(new TodoItem("two", "high"));
 
         lvItems = (ListView) findViewById(R.id.lvltems);
-        mItemsAdapter = new CustomArrayAdapter(this, R.layout.todo_item, mItems);
+        mItemsAdapter = new TodoItemAdapter(this, mItems);
         lvItems.setAdapter(mItemsAdapter);
         lvItems.requestFocus();
         // items.add("one");

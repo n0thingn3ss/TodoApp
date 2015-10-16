@@ -10,13 +10,15 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class CustomArrayAdapter extends ArrayAdapter {
+public class TodoItemAdapter extends ArrayAdapter {
 
-    public CustomArrayAdapter(Context context, int textViewResourceId) {
-        super(context, textViewResourceId);
+    // View lookup cache
+    private static class ViewHolder {
+        TextView mItemName;
+        TextView mItemPriority;
     }
 
-    public CustomArrayAdapter(Context context, int resource, ArrayList<TodoItem> items) {
+    public TodoItemAdapter(Context context, ArrayList<TodoItem> items) {
         super(context, R.layout.todo_item, items);
     }
 
