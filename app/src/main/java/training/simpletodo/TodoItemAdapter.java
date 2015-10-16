@@ -24,30 +24,31 @@ public class TodoItemAdapter extends ArrayAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
-        View v = convertView;
-
-        if (v == null) {
-            v = LayoutInflater.from(getContext()).inflate(R.layout.todo_item, null);
-        }
-
         TodoItem p = (TodoItem) getItem(position);
 
         if (p != null) {
-            TextView tt1 = (TextView) v.findViewById(R.id.itemName);
-            TextView tt2 = (TextView) v.findViewById(R.id.itemPriority);
-            ;
+            ViewHolder viewHolder; // view lookup cache stored in tag
+            if (convertView == null) {
+                viewHolder = new ViewHolder();
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.todo_item, null);
+                viewHolder.mItemName = (TextView) convertView.findViewById(R.id.itemName);
+                viewHolder.mItemPriority = (TextView) convertView.findViewById(R.id.itemPriority);
 
-            if (tt1 != null) {
-                tt1.setText(p.mName);
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
             }
 
-            if (tt2 != null) {
-                tt2.setText(p.mPriority);
+            if (viewHolder.mItemName != null) {
+                viewHolder.mItemName.setText(p.mName);
+            }
+
+            if (viewHolder.mItemPriority != null) {
+                viewHolder.mItemPriority.setText(p.mPriority);
             }
         }
 
-        return v;
+        return convertView;
     }
 
 }

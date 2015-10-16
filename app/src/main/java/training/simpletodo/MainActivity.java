@@ -36,13 +36,16 @@ public class MainActivity extends AppCompatActivity {
         mItems = new ArrayList<TodoItem>();
         mItems.add(new TodoItem("one", "low"));
         mItems.add(new TodoItem("two", "high"));
+        mItems.add(new TodoItem("three", "high"));
+        mItems.add(new TodoItem("four", "medium"));
+        mItems.add(new TodoItem("five", "medium"));
+        mItems.add(new TodoItem("six", "medium"));
+        mItems.add(new TodoItem("seven", "medium"));
 
         lvItems = (ListView) findViewById(R.id.lvltems);
         mItemsAdapter = new TodoItemAdapter(this, mItems);
         lvItems.setAdapter(mItemsAdapter);
         lvItems.requestFocus();
-        // items.add("one");
-        // items.add("two");
 
         setupListViewListener();
     }
