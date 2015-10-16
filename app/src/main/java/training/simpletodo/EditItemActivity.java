@@ -18,19 +18,26 @@ public class EditItemActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        String item = getIntent().getStringExtra("item");
-        int pos = getIntent().getIntExtra("item_pos", 0);
+        String item_name = getIntent().getStringExtra("item_name");
+        String item_priority = getIntent().getStringExtra("item_priority");
+        int item_pos = getIntent().getIntExtra("item_pos", -1);
 
-        EditText etItem = (EditText) findViewById(R.id.etItem);
-        etItem.setText(item);
-        etItem.setSelection(item.length());
+        EditText etItemName = (EditText) findViewById(R.id.etItemName);
+        etItemName.setText(item_name);
+        etItemName.setSelection(item_name.length());
+        
+        EditText etItemPriority = (EditText) findViewById(R.id.etItemPriority);
+        etItemPriority.setText(item_priority);
+        etItemPriority.setSelection(item_priority.length());
     }
 
     public void onSubmit(View v) {
-        EditText etItem = (EditText) findViewById(R.id.etItem);
+        EditText etItemName = (EditText) findViewById(R.id.etItemName);
+        EditText etItemPriority = (EditText) findViewById(R.id.etItemPriority);
 
         Intent res = new Intent();
-        res.putExtra("item", etItem.getText().toString());
+        res.putExtra("item_name", etItemName.getText().toString());
+        res.putExtra("item_priority", etItemPriority.getText().toString());
         res.putExtra("item_pos", getIntent().getIntExtra("item_pos", -1));
         res.putExtra("code", 200);
         setResult(RESULT_OK, res);

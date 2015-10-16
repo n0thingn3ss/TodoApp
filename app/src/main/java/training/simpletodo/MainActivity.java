@@ -20,8 +20,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    ArrayList<String> items;
-    ArrayAdapter<String> itemsAdapter;
+    ArrayList<TodoItem> mItems;
+    CustomArrayAdapter mItemsAdapter;
     ListView lvItems;
     private final int REQUEST_CODE = 200;
 
@@ -32,12 +32,14 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Menu menu = (Menu) findViewById(R.menu.menu_main);
+        // readItems();
+        mItems = new ArrayList<TodoItem>();
+        mItems.add(new TodoItem("one", "low"));
+        mItems.add(new TodoItem("two", "high"));
 
-        readItems();
         lvItems = (ListView) findViewById(R.id.lvltems);
-        itemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
-        lvItems.setAdapter(itemsAdapter);
+        mItemsAdapter = new CustomArrayAdapter(this, R.layout.todo_item, mItems);
+        lvItems.setAdapter(mItemsAdapter);
         lvItems.requestFocus();
         // items.add("one");
         // items.add("two");
@@ -45,34 +47,12 @@ public class MainActivity extends AppCompatActivity {
         setupListViewListener();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     public void onAddItem(View v) {
         EditText etNewItem = (EditText) findViewById(R.id.etNewItem);
         String itemText = etNewItem.getText().toString();
-        itemsAdapter.add(itemText);
+        mItemsAdapter.add(itemText);
         etNewItem.setText("");
-        writeItems();
+        //writeItems();
     }
 
     @Override
@@ -80,13 +60,21 @@ public class MainActivity extends AppCompatActivity {
         // REQUEST_CODE is defined above
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
             // Extract name value from result extras
-            String item = data.getExtras().getString("item");
+            String item_name = data.getExtras().getString("item_name");
+            String item_priority = data.getExtras().getString("item_priority");
             int item_pos = data.getExtras().getInt("item_pos", -1);
             // Toast the name to display temporarily on screen
-            items.set(item_pos, item);
-            itemsAdapter.notifyDataSetChanged();
-            writeItems();
-            Toast.makeText(this, item.concat(Integer.toString(item_pos)), Toast.LENGTH_SHORT).show();
+
+            if (item_pos >= 0 ) {
+                TodoItem tmp = mItems.get(item_pos);
+                tmp.mName = item_name;
+                tmp.mPriority = item_priority;
+
+                mItems.set(item_pos, tmp);
+                mItemsAdapter.notifyDataSetChanged();
+                //writeItems();
+                Toast.makeText(this, tmp.mName.concat(tmp.mPriority), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -99,7 +87,8 @@ public class MainActivity extends AppCompatActivity {
                                             int pos,
                                             long id) {
                         Intent editItem = new Intent(MainActivity.this, EditItemActivity.class);
-                        editItem.putExtra("item", items.get(pos));
+                        editItem.putExtra("item_name", mItems.get(pos).mName);
+                        editItem.putExtra("item_priority", mItems.get(pos).mPriority);
                         editItem.putExtra("item_pos", pos);
                         startActivityForResult(editItem, REQUEST_CODE);
                     }
@@ -112,36 +101,36 @@ public class MainActivity extends AppCompatActivity {
                                                    View item,
                                                    int pos,
                                                    long id) {
-                        items.remove(pos);
-                        itemsAdapter.notifyDataSetChanged();
-                        writeItems();
+                        mItems.remove(pos);
+                        mItemsAdapter.notifyDataSetChanged();
+                        //writeItems();
                         return true;
                     }
                 }
         );
     }
 
-    private void readItems() {
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-
-        System.out.println("File Location: " + filesDir);
-        try {
-            items = new ArrayList<String>(FileUtils.readLines(todoFile));
-
-        } catch (IOException e) {
-            items = new ArrayList<String>();
-        }
-    }
-
-    private void writeItems() {
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-
-        try {
-            FileUtils.writeLines(todoFile, items);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    private void readItems() {
+//        File filesDir = getFilesDir();
+//        File todoFile = new File(filesDir, "todo.txt");
+//
+//        System.out.println("File Location: " + filesDir);
+//        try {
+//            mItems = new ArrayList<String>(FileUtils.readLines(todoFile));
+//
+//        } catch (IOException e) {
+//            mItems = new ArrayList<String>();
+//        }
+//    }
+//
+//    private void writeItems() {
+//        File filesDir = getFilesDir();
+//        File todoFile = new File(filesDir, "todo.txt");
+//
+//        try {
+//            FileUtils.writeLines(todoFile, mItems);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }
