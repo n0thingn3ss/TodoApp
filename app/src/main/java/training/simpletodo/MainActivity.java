@@ -5,10 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -23,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<TodoItem> mItems;
     TodoItemAdapter mItemsAdapter;
     ListView lvItems;
+    String[] mPriorities;
     private final int REQUEST_CODE = 200;
 
     @Override
@@ -32,30 +30,23 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // readItems();
-        mItems = new ArrayList<TodoItem>();
-        mItems.add(new TodoItem("one", "low"));
-        mItems.add(new TodoItem("two", "high"));
-        mItems.add(new TodoItem("three", "high"));
-        mItems.add(new TodoItem("four", "medium"));
-        mItems.add(new TodoItem("five", "medium"));
-        mItems.add(new TodoItem("six", "medium"));
-        mItems.add(new TodoItem("seven", "medium"));
+        readItems();
 
         lvItems = (ListView) findViewById(R.id.lvltems);
         mItemsAdapter = new TodoItemAdapter(this, mItems);
         lvItems.setAdapter(mItemsAdapter);
         lvItems.requestFocus();
 
+        mPriorities = getResources().getStringArray(R.array.item_priority_array);
         setupListViewListener();
     }
 
     public void onAddItem(View v) {
         EditText etNewItem = (EditText) findViewById(R.id.etNewItem);
         String itemText = etNewItem.getText().toString();
-        mItemsAdapter.add(itemText);
+        mItemsAdapter.add(new TodoItem(itemText, 0));
         etNewItem.setText("");
-        //writeItems();
+        writeItems();
     }
 
     @Override
@@ -64,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
             // Extract name value from result extras
             String item_name = data.getExtras().getString("item_name");
-            String item_priority = data.getExtras().getString("item_priority");
+            Integer item_priority = data.getExtras().getInt("item_priority");
             int item_pos = data.getExtras().getInt("item_pos", -1);
             // Toast the name to display temporarily on screen
 
@@ -75,8 +66,8 @@ public class MainActivity extends AppCompatActivity {
 
                 mItems.set(item_pos, tmp);
                 mItemsAdapter.notifyDataSetChanged();
-                //writeItems();
-                Toast.makeText(this, tmp.mName.concat(tmp.mPriority), Toast.LENGTH_SHORT).show();
+                writeItems();
+                Toast.makeText(this, tmp.mName + '-' +  mPriorities[tmp.mPriority], Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -106,34 +97,40 @@ public class MainActivity extends AppCompatActivity {
                                                    long id) {
                         mItems.remove(pos);
                         mItemsAdapter.notifyDataSetChanged();
-                        //writeItems();
+                        writeItems();
                         return true;
                     }
                 }
         );
     }
 
-//    private void readItems() {
-//        File filesDir = getFilesDir();
-//        File todoFile = new File(filesDir, "todo.txt");
-//
-//        System.out.println("File Location: " + filesDir);
-//        try {
-//            mItems = new ArrayList<String>(FileUtils.readLines(todoFile));
-//
-//        } catch (IOException e) {
-//            mItems = new ArrayList<String>();
-//        }
-//    }
-//
-//    private void writeItems() {
-//        File filesDir = getFilesDir();
-//        File todoFile = new File(filesDir, "todo.txt");
-//
-//        try {
-//            FileUtils.writeLines(todoFile, mItems);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    private void readItems() {
+        File filesDir = getFilesDir();
+        File todoFile = new File(filesDir, "todo.txt");
+
+        try {
+            ArrayList<String> todoItems = new ArrayList<String>(FileUtils.readLines(todoFile));
+            mItems = new ArrayList<TodoItem>();
+            for(String todoItem : todoItems) {
+                String[] tmp = todoItem.split(",");
+                mItems.add(new TodoItem(
+                        tmp[0], Integer.parseInt(tmp[1])
+                    )
+                );
+            }
+        } catch (IOException e) {
+            mItems = new ArrayList<TodoItem>();
+        }
+    }
+
+    private void writeItems() {
+        File filesDir = getFilesDir();
+        File todoFile = new File(filesDir, "todo.txt");
+
+        try {
+            FileUtils.writeLines(todoFile, mItems);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -2,6 +2,7 @@ package training.simpletodo;
 
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,7 @@ public class TodoItemAdapter extends ArrayAdapter {
     // View lookup cache
     private static class ViewHolder {
         TextView mItemName;
-        TextView mItemPriority;
+        //TextView mItemPriority;
     }
 
     public TodoItemAdapter(Context context, ArrayList<TodoItem> items) {
@@ -25,6 +26,7 @@ public class TodoItemAdapter extends ArrayAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         TodoItem p = (TodoItem) getItem(position);
+        String[] pColors= { "#66BB6A", "#64B5F6", "#EF5350" };
 
         if (p != null) {
             ViewHolder viewHolder; // view lookup cache stored in tag
@@ -32,7 +34,7 @@ public class TodoItemAdapter extends ArrayAdapter {
                 viewHolder = new ViewHolder();
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.todo_item, null);
                 viewHolder.mItemName = (TextView) convertView.findViewById(R.id.itemName);
-                viewHolder.mItemPriority = (TextView) convertView.findViewById(R.id.itemPriority);
+               // viewHolder.mItemPriority = (TextView) convertView.findViewById(R.id.itemPriority);
 
                 convertView.setTag(viewHolder);
             } else {
@@ -41,11 +43,12 @@ public class TodoItemAdapter extends ArrayAdapter {
 
             if (viewHolder.mItemName != null) {
                 viewHolder.mItemName.setText(p.mName);
+                viewHolder.mItemName.setBackgroundColor(Color.parseColor(pColors[p.mPriority]));
             }
 
-            if (viewHolder.mItemPriority != null) {
-                viewHolder.mItemPriority.setText(p.mPriority);
-            }
+//            if (viewHolder.mItemPriority != null) {
+//                viewHolder.mItemName.setText(p.mPriority.toString());
+//            }
         }
 
         return convertView;
